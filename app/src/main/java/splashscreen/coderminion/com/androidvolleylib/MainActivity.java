@@ -1,6 +1,7 @@
 package splashscreen.coderminion.com.androidvolleylib;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -29,16 +30,23 @@ import java.io.FileOutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
-    String URL_TO_DOWNLOAD_FILE= "https://raw.githubusercontent.com/coderminion/SearchDataFromListView/master/device-2017-08-18-125137.mp4";
+    String URL_TO_DOWNLOAD_FILE= "https://github.com/coderminion/AndroidVolleyLib/raw/master/got_dracarys.mp4";
     String WRITE_EXTERNAL_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
     private final static int REQUEST_CODE = 1010;
     private final static int REQUEST_PERMISSION_SETTING = 1211;
 
+    ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Please wait...");
+        progressDialog.setMessage("downloading.....");
+        progressDialog.setCancelable(false);
+
 
         //TODO DownloadFile only if Permission is Granted
         if(ActivityCompat.checkSelfPermission(this,WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED) {
@@ -90,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
                 new Response.Listener<byte[]>() {
                     @Override
                     public void onResponse(byte[] response) {
+                        progressDialog.dismiss();
+
                         // TODO handle the response
                         try {
                             if (response!=null) {
@@ -124,10 +134,12 @@ public class MainActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 // TODO handle the error
                 error.printStackTrace();
+                progressDialog.dismiss();
             }
         }, null);
         RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext(), new HurlStack());
         mRequestQueue.add(request);
+        progressDialog.show();
     }
 
     // TO Show Video in ViewView
